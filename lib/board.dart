@@ -38,7 +38,7 @@ class _GameBoardState extends State<GameBoard> {
 
   int getTime() {
     final random = Random();
-    return 350 + random.nextInt(401);
+    return 100 + random.nextInt(500);
   }
   void gameLoop(Duration frameRate) {
     Timer.periodic(
@@ -69,19 +69,49 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void resultsDialog() {
-    showDialog(context: context, builder: (builder) => AlertDialog(
-      title: const Text('Koniec gry'),
-      content: Text('Twój wynik to $currentScore'),
-      actions: [
-        TextButton(
-          onPressed: () => {
-            resetGame(),
-            Navigator.pop(builder)
-          },
-          child: const Text('Zagraj ponownie'),
-        )
-      ],
-    ));
+    showDialog(
+      context: context,
+      builder: (builder) => AlertDialog(
+        backgroundColor: Colors.black87,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        contentPadding: const EdgeInsets.all(20),
+        title: const Row(
+          children: [
+            Text(
+              'Koniec gry',
+              style: TextStyle(color: Colors.white, fontSize: 22),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Twój wynik to $currentScore',
+              style: const TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            const Divider(color: Colors.white),
+            const SizedBox(height: 10),
+          ],
+        ),
+        actions: [
+          ElevatedButton.icon(
+            onPressed: () {
+              resetGame();
+              Navigator.pop(builder);
+            },
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            label: const Text('Zagraj ponownie'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void resetGame() {
@@ -161,7 +191,7 @@ class _GameBoardState extends State<GameBoard> {
   void createNewPice() {
     Random rand = Random();
     Tetromino randomType = Tetromino.values[rand.nextInt(Tetromino.values.length)];
-    currentPice = Pice(type: randomType);
+    // currentPice = Pice(type: randomType);
     currentPice.initializePiece();
 
     if (end()) {
@@ -188,89 +218,46 @@ class _GameBoardState extends State<GameBoard> {
   void rotatePiece() {
     currentPice.rotatePiece();
   }
+    
+  @override
+  Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
 
-@override
-Widget build(BuildContext context) {
-  final double screenHeight = MediaQuery.of(context).size.height;
-  final double screenWidth = MediaQuery.of(context).size.width;
+    final double maxBoardHeight = screenHeight * 0.75;
 
-  final double boardHeight = screenHeight * 0.75;
-  final double boardWidth = screenWidth;
+    final double pixelSize = maxBoardHeight / rows;
 
-  final double pixelSizeByHeight = boardHeight / rows;
+    final double boardHeight = pixelSize * rows;
+    final double boardWidth = pixelSize * columns;
 
-  final double currentBoardWidth = pixelSizeByHeight * columns;
+    final double horizontalSpacing = (screenWidth - boardWidth) / (columns - 1).clamp(0, double.infinity);
+    final double verticalSpacing = (boardHeight - pixelSize * rows) / (rows - 1).clamp(0, double.infinity);
 
-  if (currentBoardWidth > screenWidth) {
-    final double extraWidth = (currentBoardWidth - screenWidth) / 2;
-    final double newPixelSize = (boardHeight - 2 * extraWidth) / rows;
-    final double adjustedBoardWidth = newPixelSize * columns;
+    Widget buildGrid() {
+      return GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: columns,
+          mainAxisSpacing: verticalSpacing,
+          crossAxisSpacing: horizontalSpacing,
+        ),
+        itemCount: rows * columns,
+        itemBuilder: (context, index) {
+          int row = (index / columns).floor();
+          int col = (index % columns);
 
-    final double horizontalSpacing = (screenWidth - adjustedBoardWidth) / (columns + 1);
-    final double verticalSpacing = (boardHeight - newPixelSize * rows) / (rows - 1);
-
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(160, 180, 132, 1),
-      body: Column(
-        children: [
-          SizedBox(
-            height: boardHeight,
-            width: screenWidth,
-            child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                mainAxisSpacing: verticalSpacing,
-                crossAxisSpacing: horizontalSpacing,
-              ),
-              itemCount: rows * columns,
-              itemBuilder: (context, index) {
-                int row = (index / columns).floor();
-                int col = (index % columns);
-
-                if (currentPice.positions.contains(index)) {
-                  return Pixel(
-                    color: currentPice.color,
-                    pixelSize: newPixelSize, // Ustaw rozmiar pikseli
-                  );
-                } else if (gameBoard[row][col] != null) {
-                  final Tetromino? tetrominoType = gameBoard[row][col];
-                  return Pixel(
-                    color: tetrominoColors[tetrominoType],
-                    pixelSize: newPixelSize,
-                  );
-                } else {
-                  return Pixel(
-                    color: const Color.fromRGBO(160, 180, 132, 1),
-                    pixelSize: newPixelSize,
-                  );
-                }
-              },
-            ),
-          ),
-          Text(
-            "Punkty: $currentScore",
-            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(color: Colors.black, onPressed: rotatePiece, icon: const Icon(Icons.rotate_right)),
-                IconButton(color: Colors.black, onPressed: moveLeft, icon: const Icon(Icons.arrow_back)),
-                IconButton(color: Colors.black, onPressed: moveRight, icon: const Icon(Icons.arrow_forward)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  } else {
-    final double pixelSize = pixelSizeByHeight;
-
-    final double horizontalSpacing = (screenWidth - pixelSize * columns) / (columns - 1);
-    final double verticalSpacing = (boardHeight - pixelSize * rows) / (rows - 1);
+          if (currentPice.positions.contains(index)) {
+            return Pixel(color: currentPice.color, pixelSize: pixelSize);
+          } else if (gameBoard[row][col] != null) {
+            final Tetromino? tetrominoType = gameBoard[row][col];
+            return Pixel(color: tetrominoColors[tetrominoType], pixelSize: pixelSize);
+          } else {
+            return Pixel(color: const Color.fromRGBO(160, 180, 132, 1), pixelSize: pixelSize);
+          }
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(160, 180, 132, 1),
@@ -279,38 +266,9 @@ Widget build(BuildContext context) {
           SizedBox(
             height: boardHeight,
             width: screenWidth,
-            child: GridView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                mainAxisSpacing: verticalSpacing,
-                crossAxisSpacing: horizontalSpacing,
-              ),
-              itemCount: rows * columns,
-              itemBuilder: (context, index) {
-                int row = (index / columns).floor();
-                int col = (index % columns);
-
-                if (currentPice.positions.contains(index)) {
-                  return Pixel(
-                    color: currentPice.color,
-                    pixelSize: pixelSize,
-                  );
-                } else if (gameBoard[row][col] != null) {
-                  final Tetromino? tetrominoType = gameBoard[row][col];
-                  return Pixel(
-                    color: tetrominoColors[tetrominoType],
-                    pixelSize: pixelSize,
-                  );
-                } else {
-                  return Pixel(
-                    color: const Color.fromRGBO(160, 180, 132, 1),
-                    pixelSize: pixelSize,
-                  );
-                }
-              },
-            ),
+            child: buildGrid(),
           ),
+          const Spacer(),
           Text(
             "Punkty: $currentScore",
             style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -330,5 +288,4 @@ Widget build(BuildContext context) {
       ),
     );
   }
-}
   }

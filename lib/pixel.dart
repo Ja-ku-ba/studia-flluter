@@ -26,9 +26,9 @@ class Pixel extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(1),
+            borderRadius: BorderRadius.circular(3),
           ),
-          margin: const EdgeInsets.all(6),
+          margin: const EdgeInsets.all(3),
         ),
       ),
     );

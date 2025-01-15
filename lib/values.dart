@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-int rows = 20;
+int rows = 18;
 int columns = 10;
 
 double pixelSize = 25;
