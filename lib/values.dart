@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 int rows = 20;
 int columns = 10;
 
+double pixelSize = 25;
+
 enum Directions {
   left,
   right,

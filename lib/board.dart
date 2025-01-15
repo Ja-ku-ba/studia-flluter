@@ -19,7 +19,7 @@ class _GameBoardState extends State<GameBoard> {
   Pice currentPice = Pice(type: Tetromino.L);
   int currentScore = 0;
   bool theEnd = false;
-
+  
   @override
   void initState() {
     super.initState();
@@ -30,11 +30,16 @@ class _GameBoardState extends State<GameBoard> {
   void startGame() {
     // currentPice = getRandomPice();
     currentPice.initializePiece();
-
-    Duration frameRate = const Duration(milliseconds: 150);
+    
+    int refreshRate = getTime(); 
+    Duration frameRate = Duration(milliseconds: refreshRate);
     gameLoop(frameRate);
   }
 
+  int getTime() {
+    final random = Random();
+    return 350 + random.nextInt(401);
+  }
   void gameLoop(Duration frameRate) {
     Timer.periodic(
       frameRate,
@@ -65,15 +70,15 @@ class _GameBoardState extends State<GameBoard> {
 
   void resultsDialog() {
     showDialog(context: context, builder: (builder) => AlertDialog(
-      title: Text('Koniec gry'),
-      content: Text('Twój wynik to ${currentScore}'),
+      title: const Text('Koniec gry'),
+      content: Text('Twój wynik to $currentScore'),
       actions: [
         TextButton(
           onPressed: () => {
             resetGame(),
             Navigator.pop(builder)
           },
-          child: Text('Zagraj ponownie'),
+          child: const Text('Zagraj ponownie'),
         )
       ],
     ));
@@ -184,53 +189,146 @@ class _GameBoardState extends State<GameBoard> {
     currentPice.rotatePiece();
   }
 
-  @override
-  Widget build(BuildContext context) {
+@override
+Widget build(BuildContext context) {
+  final double screenHeight = MediaQuery.of(context).size.height;
+  final double screenWidth = MediaQuery.of(context).size.width;
+
+  final double boardHeight = screenHeight * 0.75;
+  final double boardWidth = screenWidth;
+
+  final double pixelSizeByHeight = boardHeight / rows;
+
+  final double currentBoardWidth = pixelSizeByHeight * columns;
+
+  if (currentBoardWidth > screenWidth) {
+    final double extraWidth = (currentBoardWidth - screenWidth) / 2;
+    final double newPixelSize = (boardHeight - 2 * extraWidth) / rows;
+    final double adjustedBoardWidth = newPixelSize * columns;
+
+    final double horizontalSpacing = (screenWidth - adjustedBoardWidth) / (columns + 1);
+    final double verticalSpacing = (boardHeight - newPixelSize * rows) / (rows - 1);
+
     return Scaffold(
-      backgroundColor: Color.fromRGBO(160,180,132,1),
+      backgroundColor: const Color.fromRGBO(160, 180, 132, 1),
       body: Column(
         children: [
-          Expanded(
+          SizedBox(
+            height: boardHeight,
+            width: screenWidth,
             child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                mainAxisSpacing: verticalSpacing,
+                crossAxisSpacing: horizontalSpacing,
+              ),
               itemCount: rows * columns,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns),
               itemBuilder: (context, index) {
                 int row = (index / columns).floor();
                 int col = (index % columns);
+
                 if (currentPice.positions.contains(index)) {
                   return Pixel(
-                    color: currentPice.color, 
-                    child: index,
+                    color: currentPice.color,
+                    pixelSize: newPixelSize, // Ustaw rozmiar pikseli
                   );
                 } else if (gameBoard[row][col] != null) {
-                    final Tetromino? tetrominoType = gameBoard[row][col];
-                    return Pixel(color: tetrominoColors[tetrominoType], child: '');
+                  final Tetromino? tetrominoType = gameBoard[row][col];
+                  return Pixel(
+                    color: tetrominoColors[tetrominoType],
+                    pixelSize: newPixelSize,
+                  );
                 } else {
-                   return Pixel(
-                    color: Color.fromRGBO(160,180,132,1), 
-                    child: index,
+                  return Pixel(
+                    color: const Color.fromRGBO(160, 180, 132, 1),
+                    pixelSize: newPixelSize,
                   );
                 }
-              } 
+              },
             ),
           ),
           Text(
-            "Punkty: ${currentScore}",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            "Punkty: $currentScore",
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(color:Colors.black, onPressed: rotatePiece, icon: Icon(Icons.rotate_right)),
-                IconButton(color:Colors.black, onPressed: moveLeft, icon: Icon(Icons.arrow_back)),
-                IconButton(color:Colors.black, onPressed: moveRight, icon: Icon(Icons.arrow_forward)),
+                IconButton(color: Colors.black, onPressed: rotatePiece, icon: const Icon(Icons.rotate_right)),
+                IconButton(color: Colors.black, onPressed: moveLeft, icon: const Icon(Icons.arrow_back)),
+                IconButton(color: Colors.black, onPressed: moveRight, icon: const Icon(Icons.arrow_forward)),
               ],
             ),
-          )
+          ),
+        ],
+      ),
+    );
+  } else {
+    final double pixelSize = pixelSizeByHeight;
+
+    final double horizontalSpacing = (screenWidth - pixelSize * columns) / (columns - 1);
+    final double verticalSpacing = (boardHeight - pixelSize * rows) / (rows - 1);
+
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(160, 180, 132, 1),
+      body: Column(
+        children: [
+          SizedBox(
+            height: boardHeight,
+            width: screenWidth,
+            child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                mainAxisSpacing: verticalSpacing,
+                crossAxisSpacing: horizontalSpacing,
+              ),
+              itemCount: rows * columns,
+              itemBuilder: (context, index) {
+                int row = (index / columns).floor();
+                int col = (index % columns);
+
+                if (currentPice.positions.contains(index)) {
+                  return Pixel(
+                    color: currentPice.color,
+                    pixelSize: pixelSize,
+                  );
+                } else if (gameBoard[row][col] != null) {
+                  final Tetromino? tetrominoType = gameBoard[row][col];
+                  return Pixel(
+                    color: tetrominoColors[tetrominoType],
+                    pixelSize: pixelSize,
+                  );
+                } else {
+                  return Pixel(
+                    color: const Color.fromRGBO(160, 180, 132, 1),
+                    pixelSize: pixelSize,
+                  );
+                }
+              },
+            ),
+          ),
+          Text(
+            "Punkty: $currentScore",
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(color: Colors.black, onPressed: rotatePiece, icon: const Icon(Icons.rotate_right)),
+                IconButton(color: Colors.black, onPressed: moveLeft, icon: const Icon(Icons.arrow_back)),
+                IconButton(color: Colors.black, onPressed: moveRight, icon: const Icon(Icons.arrow_forward)),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
+  }

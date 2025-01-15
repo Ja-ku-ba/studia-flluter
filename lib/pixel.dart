@@ -2,22 +2,35 @@ import 'package:flutter/material.dart';
 
 class Pixel extends StatelessWidget {
   var color;
-  var child;
+  var pixelSize;
   Pixel({
     super.key,
     required this.color,
-    required this.child
+    required this.pixelSize,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color, 
-        borderRadius: BorderRadius.circular(2), // Border radius
-        border: Border.all(color: Colors.black),
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: pixelSize,
+        maxHeight: pixelSize,
       ),
-      margin: const EdgeInsets.all(1),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.black),
+        ),
+        margin: const EdgeInsets.all(1),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(1),
+          ),
+          margin: const EdgeInsets.all(6),
+        ),
+      ),
     );
   }
 }
