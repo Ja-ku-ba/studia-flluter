@@ -1,3 +1,14 @@
+# Projekt zaliczeniowy
+## na programowanie z Fluttera
+
+![Zrzut ekranu gry na telefonie 1](./readme_images/tele0.jpg)
+
+![Zrzut ekranu gry na telefonie 2](./readme_images/tele1.jpg)
+
+![Zrzut ekranu gry na telefonie 3](./readme_images/tele2.jpg)
+
+![Przykład na komputerze](./readme_images/pc.png)
+
 # untitled11
 
 A new Flutter project.
