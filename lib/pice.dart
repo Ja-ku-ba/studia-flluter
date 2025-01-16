@@ -18,37 +18,37 @@ class Pice {
     switch (type) {
       case Tetromino.L:
         positions = [
-          4 - 3*rows, 14 - 3*rows, 24 - 3*rows, 25 - 3*rows
+          4 - 3*columns, (columns + 4) - 3*columns, (2*columns + 4) - 3*columns, (2*columns + 5) - 3*columns
         ];
         break;
       case Tetromino.J:
         positions = [
-          5 - 3*rows, 15 - 3*rows, 25 - 3*rows, 24 - 3*rows
+          5 - 3*columns, (columns + 5) - 3*columns, (2*columns + 5) - 3*columns, (2*columns + 4) - 3*columns
         ];
         break;
       case Tetromino.I:
         positions = [
-          3 - rows, 4  - rows, 5 - rows, 6 - rows
+          3 - columns, 4  - columns, 5 - columns, 6 - columns
         ];
         break;
       case Tetromino.O:
         positions = [
-          4 - 2*rows, 5 - 2*rows, 14 - 2*rows, 15 - 2*rows
+          4 - 2*columns, 5 - 2*columns, 4 - columns, 5 - columns
         ];
         break;
       case Tetromino.S:
         positions = [
-          4 - 2*rows, 14 - 2*rows, 15 - 2*rows, 25 - 2*rows
+          5 - columns, 4 - columns, 4, 3
         ];
         break;
       case Tetromino.Z:
         positions = [
-          5 - 2*rows, 15 - 2*rows, 14 - 2*rows, 24 - 2*rows
+          3 - columns, 4 - columns, 4, 5
         ];
         break;
       case Tetromino.T:
         positions = [
-          4 - 2*rows, 14 - 2*rows, 24 - 2*rows, 15 - 2*rows
+          4 - 2*columns, 4 - columns, 4, 5 - columns
         ];
         break;
       default:
@@ -284,10 +284,10 @@ class Pice {
             break;
           case 3:
             newPosition = [
-              positions[1] - columns,
-              positions[1],
+              positions[1] - columns - 1,
               positions[1] - 1,
-              positions[1] + columns + 1
+              positions[1],
+              positions[1] + columns
             ];
   
             if (picePositionIsValid(newPosition)) {
@@ -301,9 +301,9 @@ class Pice {
         switch (rotationState) {
           case 0: 
             newPosition = [
-              positions[1] + columns -2,
-              positions[1],
               positions[1] + columns - 1,
+              positions[1],
+              positions[1] + columns,
               positions[1] + 1
             ];
             if (picePositionIsValid(newPosition)) {
@@ -313,10 +313,10 @@ class Pice {
             break;
           case 1:
             newPosition = [
-              positions[1] - columns + 2,
-              positions[1],
               positions[1] + columns + 1,
-              positions[1] - 1
+              positions[1],
+              positions[1] - columns,
+              positions[1] + 1
             ];
             if (picePositionIsValid(newPosition)) {
               positions = newPosition;
@@ -325,9 +325,9 @@ class Pice {
             break;
           case 2:
             newPosition = [
-              positions[1] + columns - 2,
-              positions[1],
               positions[1] + columns - 1,
+              positions[1],
+              positions[1] + columns,
               positions[1] + 1
             ];
             if (picePositionIsValid(newPosition)) {
@@ -337,10 +337,10 @@ class Pice {
             break;
           case 3:
             newPosition = [
-              positions[1] - columns + 2,
+              positions[1] + columns + 1,
               positions[1],
-              positions[1] - columns + 1,
-              positions[1] - 1
+              positions[1] - columns,
+              positions[1] + 1
             ];
   
             if (picePositionIsValid(newPosition)) {
@@ -354,7 +354,7 @@ class Pice {
         switch (rotationState) {
           case 0: 
             newPosition = [
-              positions[1] + columns - columns,
+              positions[1] + columns * 2,
               positions[1],
               positions[1] + columns + 1,
               positions[1] + columns
@@ -378,10 +378,10 @@ class Pice {
             break;
           case 2:
             newPosition = [
-              positions[1] - columns,
-              positions[1] - 1,
+              positions[1] - columns + 1,
               positions[1],
-              positions[1] + columns
+              positions[1] + 1,
+              positions[1] + columns + 1
             ];
             if (picePositionIsValid(newPosition)) {
               positions = newPosition;
@@ -390,10 +390,10 @@ class Pice {
             break;
           case 3:
             newPosition = [
-              positions[1] - columns,
-              positions[1] - 1,
+              positions[1] - columns + 1,
               positions[1],
-              positions[1] + 1
+              positions[1] + 1,
+              positions[1] + 2
             ];
   
             if (picePositionIsValid(newPosition)) {

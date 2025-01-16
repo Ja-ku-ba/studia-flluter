@@ -38,8 +38,9 @@ class _GameBoardState extends State<GameBoard> {
 
   int getTime() {
     final random = Random();
-    return 100 + random.nextInt(500);
+    return 100 + random.nextInt(400);
   }
+
   void gameLoop(Duration frameRate) {
     Timer.periodic(
       frameRate,
@@ -106,7 +107,7 @@ class _GameBoardState extends State<GameBoard> {
             icon: const Icon(Icons.refresh, color: Colors.white),
             label: const Text('Zagraj ponownie'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.green,
             ),
           ),
         ],
@@ -191,7 +192,7 @@ class _GameBoardState extends State<GameBoard> {
   void createNewPice() {
     Random rand = Random();
     Tetromino randomType = Tetromino.values[rand.nextInt(Tetromino.values.length)];
-    // currentPice = Pice(type: randomType);
+    currentPice = Pice(type: randomType);
     currentPice.initializePiece();
 
     if (end()) {
@@ -231,7 +232,7 @@ class _GameBoardState extends State<GameBoard> {
     final double boardHeight = pixelSize * rows;
     final double boardWidth = pixelSize * columns;
 
-    final double horizontalSpacing = (screenWidth - boardWidth) / (columns - 1).clamp(0, double.infinity);
+    final double horizontalSpacing = (screenWidth - boardWidth) / (columns - 5).clamp(0, double.infinity);
     final double verticalSpacing = (boardHeight - pixelSize * rows) / (rows - 1).clamp(0, double.infinity);
 
     Widget buildGrid() {
@@ -288,4 +289,4 @@ class _GameBoardState extends State<GameBoard> {
       ),
     );
   }
-  }
+}
